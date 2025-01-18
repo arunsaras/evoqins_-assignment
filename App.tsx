@@ -1,118 +1,151 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useEffect, useMemo, useReducer} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import OnBoard from './src/screens/onBoard';
+import Login from './src/screens/login';
+import Dashboard from './src/screens/dashboard';
+import RNSecureStorage, {ACCESSIBLE} from 'rn-secure-storage';
+import {AuthContext} from './src/utils/auth';
+import {ActivityIndicator, Image, View} from 'react-native';
+import {initialLoginState, loginReducer} from './src/utils/constants';
+import {colorResources} from './src/utils/colorResources';
+import {Images} from './src/utils/images';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const App = () => {
+  const Stack = createNativeStackNavigator();
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  const [loginState, dispatch] = useReducer(loginReducer, initialLoginState);
+  const authContext = useMemo(
+    () => ({
+      signIn: async (ID: any) => {
+        dispatch({type: 'SETLOADING', isLoading: true});
+        let userToken = 'LoggedIn';
+        await RNSecureStorage.setItem('userToken', userToken, {
+          accessible: ACCESSIBLE.WHEN_UNLOCKED,
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.log(err);
+          });
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+        let userBoard = 'Onboarded';
+        await RNSecureStorage.setItem('userBoard', userBoard, {
+          accessible: ACCESSIBLE.WHEN_UNLOCKED,
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.log(err);
+          });
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+        await RNSecureStorage.setItem('onceLoggedIn', 'Done', {
+          accessible: ACCESSIBLE.WHEN_UNLOCKED,
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+
+        dispatch({
+          type: 'LOGIN',
+          id: ID,
+          token: userToken,
+          userBoard: userBoard,
+        });
+      },
+
+      onBoard: async () => {
+        dispatch({type: 'SETLOADING', isLoading: true});
+        let userBoard = 'Onboarded';
+        await RNSecureStorage.setItem('userBoard', userBoard, {
+          accessible: ACCESSIBLE.WHEN_UNLOCKED,
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+        dispatch({type: 'ONBOARD', userBoard: userBoard});
+      },
+
+      signOut: async () => {
+        dispatch({type: 'SETLOADING', isLoading: true});
+        RNSecureStorage.removeItem('userToken')
+          .then(res => {
+            console.log(res);
+            dispatch({type: 'LOGOUT'});
+          })
+          .catch(err => {
+            console.log(err);
+          });
+
+        console.log('logged out');
+      },
+    }),
+    [],
   );
-}
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    setTimeout(async () => {
+      let userBoard = null;
+      let userToken = null;
+      try {
+        userBoard = await RNSecureStorage.getItem('userBoard');
+        userToken = await RNSecureStorage.getItem('userToken');
+        console.log(userBoard);
+        console.log(userToken);
+      } catch (error) {
+        // Error saving data
+        console.log(error);
+      }
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+      dispatch({type: 'REGISTER', token: userToken, userBoard: userBoard});
+    }, 2000);
+  }, []);
+
+  if (loginState.isLoading) {
+    console.log('2');
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colorResources.elephantBlack,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Image
+          source={Images.logo}
+          style={{height: 50, width: 200, marginBottom: 10}}
+        />
+
+        <ActivityIndicator size={'large'} color={colorResources.grey} />
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <AuthContext.Provider value={authContext}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          {loginState.userBoard && loginState.userToken ? (
+            <Stack.Screen name="dashboard" component={Dashboard} />
+          ) : loginState.userBoard ? (
+            <Stack.Screen name="login" component={Login} />
+          ) : (
+            <Stack.Screen name="onBoard" component={OnBoard} />
+          )}
+          <Stack.Screen name="loginGuest" component={Login} />
+          <Stack.Screen name="dashboardGuest" component={Dashboard} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+};
 
 export default App;
