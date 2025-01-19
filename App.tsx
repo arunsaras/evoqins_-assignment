@@ -12,8 +12,10 @@ import {colorResources} from './src/utils/colorResources';
 import {Images} from './src/utils/images';
 
 const App = () => {
+  // navigation stack initialized
   const Stack = createNativeStackNavigator();
 
+  // Authentication flow implemented
   const [loginState, dispatch] = useReducer(loginReducer, initialLoginState);
   const authContext = useMemo(
     () => ({
@@ -32,16 +34,6 @@ const App = () => {
 
         let userBoard = 'Onboarded';
         await RNSecureStorage.setItem('userBoard', userBoard, {
-          accessible: ACCESSIBLE.WHEN_UNLOCKED,
-        })
-          .then(res => {
-            console.log(res);
-          })
-          .catch(err => {
-            console.log(err);
-          });
-
-        await RNSecureStorage.setItem('onceLoggedIn', 'Done', {
           accessible: ACCESSIBLE.WHEN_UNLOCKED,
         })
           .then(res => {
@@ -92,6 +84,7 @@ const App = () => {
   );
 
   useEffect(() => {
+    // Checking whether the user is already onboarded or logged in
     setTimeout(async () => {
       let userBoard = null;
       let userToken = null;
@@ -109,6 +102,7 @@ const App = () => {
     }, 2000);
   }, []);
 
+  // splash screen
   if (loginState.isLoading) {
     console.log('2');
     return (
@@ -130,6 +124,7 @@ const App = () => {
   }
 
   return (
+    // routing stack
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>

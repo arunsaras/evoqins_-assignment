@@ -30,20 +30,13 @@ const styles = StyleSheet.create({
   },
   parallelogramInner: {
     position: 'absolute',
-    // left: 50,
-    // top: 0,
-    // backgroundColor: '#292e39', 
     height: 100,
   },
   parallelogramRight: {
     position: 'absolute',
-    // top: 0,
-    // right: -24, 
   },
   parallelogramLeft: {
     position: 'absolute',
-    // top: 0,
-    // left: 25,
   },
   triangleUp: {
     width: 0,

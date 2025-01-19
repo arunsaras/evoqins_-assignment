@@ -1,3 +1,4 @@
+// images
 export const  Images = {
 circle_half : require('../assets/images/circle-half.png'),
 flash: require('../assets/images/flash.png'),

@@ -1,3 +1,4 @@
+// colors
 export const colorResources = {
     red:'#6e080f',
     elephantBlack:'#292e39',

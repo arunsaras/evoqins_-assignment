@@ -1,15 +1,16 @@
+// For Authentication flows, variable initialized
 export const initialLoginState = {
   isLoading: true,
   userToken: null,
   userBoard: null,
 };
-
+// type
 type LoginState = {
   isLoading: boolean;
   userToken: string | null;
   userBoard: string | null;
 };
-
+// type
 type LoginAction =
   | {type: 'REGISTER'; token: string | null; userBoard: string | null}
   | {type: 'LOGIN'; id: any; token: string; userBoard: string}
@@ -17,6 +18,8 @@ type LoginAction =
   | {type: 'ONBOARD'; userBoard: string}
   | {type: 'SETLOADING'; isLoading: boolean};
 
+
+// update the state using reducer
 export const loginReducer = (
   prevState: LoginState,
   action: LoginAction,
@@ -62,6 +65,6 @@ export const loginReducer = (
       return prevState;
   }
 };
-
+// credential regex
 export const userNameRegex = /^(?![-_])[a-zA-Z0-9_-]{3,}(?<![-_])$/;
 export const passcodeRegex = /^.{8,}$/;

@@ -6,10 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Button from '../components/button';
 import {AuthContext} from '../utils/auth';
-import RNSecureStorage from 'rn-secure-storage';
 import {Images} from '../utils/images';
 import {colorResources} from '../utils/colorResources';
 import {passcodeRegex, userNameRegex} from '../utils/constants';
@@ -17,21 +16,13 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const Login = ({navigation}) => {
   const {signIn} = useContext(AuthContext);
-  const [onceLoggedIn, setOnceLoggedIn] = useState(null);
   const [userName, setUserName] = useState('');
   const [passcode, setPasscode] = useState('');
 
   let checkCred = userNameRegex.test(userName) && passcodeRegex.test(passcode);
-
-  useEffect(() => {
-    setTimeout(async () => {
-      setOnceLoggedIn(await RNSecureStorage.getItem('onceLoggedIn'));
-      console.log('Already logged in', onceLoggedIn);
-    });
-  }, []);
-
+  // handled skip button
   const handleSkip = () => navigation.navigate('dashboardGuest');
-
+  // handled login button
   const handleSignIn = () => signIn();
 
   return (

@@ -7,10 +7,11 @@ import {Images} from '../utils/images';
 import {colorResources} from '../utils/colorResources';
 
 const OnBoard = ({navigation}) => {
+  // AuthContext initialized
   const {onBoard} = useContext(AuthContext);
-
+  // handled skip button
   const handleSkip = () => navigation.navigate('loginGuest');
-
+  // handled next button
   const handleNext = () => onBoard();
 
   return (

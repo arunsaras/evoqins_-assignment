@@ -19,6 +19,7 @@ const Dashboard = ({navigation}) => {
   const {signOut} = useContext(AuthContext);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
 
+  // checking whether user is logged In or not
   useEffect(() => {
     setTimeout(async () => {
       setIsLoggedIn(await RNSecureStorage.getItem('userToken'));
@@ -26,8 +27,10 @@ const Dashboard = ({navigation}) => {
     });
   }, []);
 
+  // handled back button
   const handleBack = () => navigation.goBack();
 
+  // handled option icon
   const handleOption = async () => {
     if (isLoggedIn != null) {
       Alert.alert('Sign Out', 'Are you sure you want to logout?', [
